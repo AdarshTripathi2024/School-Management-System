@@ -8,12 +8,17 @@ use App\Models\Teacher;
 use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Grade;
+use App\Models\Driver;
 use App\Models\GradeSubjectTeacher;
 use App\Models\User;
 use App\Models\Notice;
+use App\Models\Transport;
+use App\Models\Complaint;
 use Illuminate\Support\Facades\Auth; 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Artisan;
+use File;
 
 class HomeController extends Controller
 {
@@ -34,8 +39,13 @@ class HomeController extends Controller
             $students = Student::latest()->get();
             $subjects = Subject::latest()->get();
             $classes  = Grade::latest()->get();
+            $drivers  = Driver::latest()->get();
+            $transports  = Transport::latest()->get();
+            $notices = Notice::whereDate('expiry_date', '>=', today())->count();
+            // $complaints = Complaint::whereDate('', '>=', today())->count();
 
-            return view('home', compact('parents', 'teachers', 'students', 'subjects', 'classes'));
+
+            return view('home', compact('parents', 'teachers', 'students', 'subjects', 'classes','transports','drivers'));
 
             } elseif ($user->hasRole('Teacher')) {
                 $teacherId = auth()->user()->teacher->id;
@@ -50,7 +60,6 @@ class HomeController extends Controller
                         ->get()
                         ->groupBy(fn($item) => $item->grade->class_name);
                 $classes = $teacher->classTeacherOf;
-                // dd($classes);
                 $today = now();
                 $notices = Notice::whereDate('notice_date', '<=', $today)
                     ->whereDate('expiry_date', '>=', $today)
@@ -138,6 +147,47 @@ class HomeController extends Controller
         ]);
         auth()->logout();
         return redirect()->route('login')->with('success', 'Password changed successfully. Please log in again.');
+    }
+    
+    public function dbBackup()
+    {
+        $db = env('DB_DATABASE');
+        $user = env('DB_USERNAME');
+        $pass = env('DB_PASSWORD');
+        $host = env('DB_HOST', '127.0.0.1');
+        $mysqldump = "D:/xamp_8/mysql/bin/mysqldump.exe";
+        $fileName = "db-backup-" . date("Y-m-d_H-i-s") . ".sql";
+        $filePath = storage_path("app/" . $fileName);
+        $command = "\"{$mysqldump}\" -h {$host} -u {$user} --password=\"{$pass}\" {$db} > \"{$filePath}\"";
+        system($command);
+        return response()->download($filePath)->deleteFileAfterSend(true);
+    }
+
+     public function refresh()
+    {
+        // Clear caches
+        Artisan::call('cache:clear');
+        Artisan::call('route:clear');
+        Artisan::call('config:clear');
+        Artisan::call('view:clear');
+
+        // Re-optimize
+        Artisan::call('config:cache');
+        Artisan::call('route:cache');
+
+        // Clear logs
+        $files = glob(storage_path('logs/*.log'));
+        foreach ($files as $file) {
+            file_put_contents($file, '');
+        }
+
+        // Clear session files (optional)
+        $sessions = glob(storage_path('framework/sessions/*'));
+        foreach ($sessions as $session) {
+            @unlink($session);
+        }
+
+        return back()->with('success', 'System refreshed! App will run smoother now.');
     }
 
 }

@@ -49,11 +49,6 @@ class AttendanceController extends Controller
         return view('backend.attendance.index', compact('attendances','months'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         
@@ -89,8 +84,7 @@ public function store(Request $request)
 
         $teacher = Teacher::findOrFail(auth()->user()->teacher->id);
         $class   = Grade::findOrFail($classid);
-        // dd($teacher->id, $class->class_teacher, $teacherid, $class->class_teacher);
-        // Security checks
+     
       if ((int)$teacher->id !== (int)$class->class_teacher || (int)$teacherid !== (int)$class->class_teacher) {
             Log::warning('Unauthorized attendance submission attempt', [
                 'teacher_id' => $teacher->id,
@@ -100,6 +94,11 @@ public function store(Request $request)
                              ->with('error', 'Unauthorized access — you are not the class teacher of this class.');
         }
 
+          if (date('w', strtotime($attenddate)) == 0) { // 0 = Sunday
+            Log::info('Attendance blocked due to Sunday', ['date' => $attenddate]);
+            return redirect()->route('teacher.attendance.list')
+                             ->with('error', 'Attendance cannot be taken on Sunday.');
+        }
         // Check if already taken
         $dataexist = Attendance::whereDate('attendence_date', $attenddate)
                                 ->where('class_id', $classid)

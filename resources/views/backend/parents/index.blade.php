@@ -29,8 +29,8 @@
                     <div class="w-3/12 px-4 py-3 text-sm font-semibold text-gray-600 tracking-tight">{{ $parent->user->email }}</div>
                     <div class="w-2/12 px-4 py-3 text-sm font-semibold text-gray-600 tracking-tight">
                         @foreach ($parent->children as $children)
-                            <span class="bg-gray-200 text-xs font-normal px-2 py-px border rounded-full inline-flex my-px">
-                                {{ $children->user->name }}
+                            <span class="bg-gray-200 text-xs text-center     font-normal px-2 py-px border rounded-full inline-flex my-px">
+                                {{ $children->user->name }} <br>  Class - {{ $children->class->class_name }}
                             </span>
                         @endforeach
                     </div>

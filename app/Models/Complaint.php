@@ -12,13 +12,13 @@ class Complaint extends Model
         'complaint_from_id','complaint_to_id','student_id','subject','description','solution','status','attachment'
     ];
 
-     // 🧍‍♂️ The user who raised the complaint
+     //  The user who raised the complaint
     public function fromUser()
     {
         return $this->belongsTo(User::class, 'complaint_from_id');
     }
 
-    // 🧍‍♀️ The user who is receiving / responsible for the complaint
+    // The user who is receiving / responsible for the complaint
     public function toUser()
     {
         return $this->belongsTo(User::class, 'complaint_to_id');
@@ -27,6 +27,6 @@ class Complaint extends Model
     //  If the complaint is about a student
     public function student()
     {
-        return $this->belongsTo(Student::class, 'student_id');
+        return $this->belongsTo(User::class, 'student_id');
     }
 }

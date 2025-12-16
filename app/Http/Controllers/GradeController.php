@@ -15,11 +15,9 @@ class GradeController extends Controller
 {
     public function index()
     {
-        $classes = Grade::latest()->paginate(10);
+        $classes = Grade::with('teacher.user')->orderBy('id', 'ASC')->paginate(10);
         return view('backend.classes.index',compact('classes'));
     }
-
-  
 
     public function create()
     {

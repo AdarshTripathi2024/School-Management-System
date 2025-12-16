@@ -35,7 +35,7 @@ class Teacher extends Model
 
 public function classTeacherOf()
 {
-    return $this->hasMany(Grade::class, 'class_teacher');
+    return $this->hasMany   (Grade::class, 'class_teacher');
 }
 
 public function subjects()

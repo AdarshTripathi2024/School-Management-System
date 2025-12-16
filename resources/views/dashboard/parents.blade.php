@@ -37,7 +37,7 @@
                     </div>
                     <div class="flex items-center justify-between">
                         <div class="w-1/2 text-sm text-right">Date of Birth :</div>
-                        <div class="w-1/2 text-sm text-left ml-2">{{ $children->dateofbirth }}</div>
+                        <div class="w-1/2 text-sm text-left ml-2"> {{ date('d-m-Y', strtotime($children->dateofbirth)) }}</div>
                     </div>
                     <div class="flex items-center justify-between">
                         <div class="w-1/2 text-sm text-right">Address :</div>

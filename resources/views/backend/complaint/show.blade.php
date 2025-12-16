@@ -17,10 +17,9 @@
         <h3 class="text-lg font-semibold mb-4">Complaint Information</h3>
 
         <div class="grid grid-cols-2 gap-4">
-            <div><strong>ID:</strong> {{ $complaint->id }}</div>
             <div><strong>Status:</strong> <span class="capitalize">{{ $complaint->status }}</span></div>
-            <div><strong>From:</strong> {{ $complaint->complaint_from_id }}</div>
-            <div><strong>To:</strong> {{ $complaint->complaint_to_id }}</div>
+            <div><strong>From:</strong> {{ $complaint->fromUser->name }}</div>
+            <div><strong>To:</strong> {{ $complaint->toUser->name }}</div>
             <div class="col-span-2"><strong>Subject:</strong> {{ $complaint->subject }}</div>
             <div class="col-span-2"><strong>Description:</strong> {{ $complaint->description }}</div>
         </div>
@@ -39,6 +38,7 @@
                             <small class="text-gray-500">{{ $log->created_at }}</small>
                         </div>
                         <p class="text-sm text-gray-600">Status: <strong>{{ $log->status }}</strong></p>
+                        <p class="text-sm text-gray-600">Status Changed By: <strong>{{ $log->changed_by_name }}</strong></p>
                     </li>
                 @endforeach
             </ul>

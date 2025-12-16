@@ -94,15 +94,14 @@
             <div class="w-1/4 text-right text-white py-2 px-4 font-semibold">Phone</div>
             <div class="w-1/4 text-right text-white py-2 px-4 font-semibold">Parents</div>
         </div>
-
+    @foreach($detail->students as $student)
         <div class="flex items-center justify-between border border-gray-200 mb-px">
-            @foreach($detail->students as $student)
             <div class="w-1/4 text-left text-gray-600 py-2 px-4 font-medium">{{ $student->user->name }}</div>
             <div class="w-1/4 text-left text-gray-600 py-2 px-4 font-medium">{{ $student->user->email}}</div>
             <div class="w-1/4 text-right text-gray-600 py-2 px-4 font-medium">{{ $student->phone }}</div>
             <div class="w-1/4 text-right text-gray-600 py-2 px-4 font-medium">{{ $student->parent->user->name }}</div>
-            @endforeach
         </div>
+    @endforeach
 
     </div>
 
@@ -156,19 +155,19 @@
 </div>
 
 <!--  change class teacher Modal -->
-  
-<!-- Modal -->
-<div id="classChangeModal"
-     class="fixed inset-0 flex items-center justify-center z-50"
-     style="display: none; background-color: rgba(255, 255, 255, 0.5);">
+    
+    <!-- Modal -->
+    <div id="classChangeModal"
+        class="fixed inset-0 flex items-center justify-center z-50"
+        style="display: none; background-color: rgba(255, 255, 255, 0.5);">
 
-    <!-- Modal Box -->
-    <div class="relative bg-white rounded-lg shadow-lg w-full max-w-md p-6">
-        <!-- Close Button -->
-        <button id="closeChangeModal"
-            class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl font-bold leading-none">
-            ✕
-        </button>
+        <!-- Modal Box -->
+        <div class="relative bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+            <!-- Close Button -->
+            <button id="closeChangeModal"
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl font-bold leading-none">
+                ✕
+            </button>
 
         <!-- Modal Heading -->
         <h3 class="text-xl font-semibold text-gray-800 mb-4 text-center">Add/Change Class Teacher</h3>

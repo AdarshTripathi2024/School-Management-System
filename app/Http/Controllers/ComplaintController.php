@@ -75,21 +75,21 @@ class ComplaintController extends Controller
     $toUser = $toUser->merge($admins);
 
     $students = User::whereIn('id',$children->pluck('user_id'))->get();
-    // dd($toUser);
+
 }
 if(auth()->user()->hasRole('Teacher')){
-     $teacher_id = auth()->user()->teacher->id;
-            $class= Grade::where('class_teacher',$teacher_id)->get();
-            $parent_id = Student::whereIn('class_id',$class->pluck('id'))->pluck('parent_id');
-            $user_ids= Parents::whereIn('id',$parent_id)->pluck('user_id');
-            $toUser = User::whereIn('id',$user_ids)->get();
-            $admins = User::role('Admin')->get();
-            $toUser = $toUser->merge($admins);
+    $teacher_id = auth()->user()->teacher->id;
+    $class= Grade::where('class_teacher',$teacher_id)->get();
+    $parent_id = Student::whereIn('class_id',$class->pluck('id'))->pluck('parent_id');
+    $user_ids= Parents::whereIn('id',$parent_id)->pluck('user_id');
+    $toUser = User::whereIn('id',$user_ids)->get();
+    $admins = User::role('Admin')->get();
+    $toUser = $toUser->merge($admins);
 
-            $student_ids = Student::whereIn('class_id', $class->pluck('id'))->pluck('user_id');
-            $students = User::whereIn('id',$student_ids)->get();
-            // dd($students);
-       }
+    $student_ids = Student::whereIn('class_id', $class->pluck('id'))->pluck('user_id');
+    $students = User::whereIn('id',$student_ids)->get();
+    // dd($students);
+}
 
        //dd($toUser);
         return view('backend.complaint.create',compact('toUser','students'));
@@ -115,13 +115,21 @@ public function store(Request $request)
             Log::info('Attachment uploaded', ['file_path' => $filePath]);
         }
 
-        Complaint::create([
+        $complaint = Complaint::create([
             'complaint_to_id' => $request->complaint_to_id,
             'complaint_from_id' => auth()->user()->id,
             'student_id' => $request->student_id,
             'subject' => $request->subject,
             'description' => $request->description,
             'attachment' => $filePath,
+        ]);
+        DB::table('complaint_logs')->insert([
+            'complaint_id' => $complaint->id,
+            'status' => 'pending',
+            'remark' => 'New Complaint Created',
+            'changed_by' => $complaint->complaint_from_id,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         return redirect()
@@ -222,7 +230,6 @@ if(auth()->user()->hasRole('Teacher')){
         ];
         
     if ($request->hasFile('attachment')) {
-       
         if ($complaint->attachment && Storage::disk('public')->exists($complaint->attachment)) {
             Storage::disk('public')->delete($complaint->attachment);
         }
@@ -253,12 +260,13 @@ if(auth()->user()->hasRole('Teacher')){
     public function show(String $id)
     {
         $user = auth()->user();
-        $complaint = Complaint::findOrFail($id);
+        $complaint = Complaint::with(['fromUser', 'toUser', 'student'])->findOrFail($id);
         if(!$complaint){
             return redirect()->route('complaint.index')->with('error','No complaint Data found');
         }
         if($complaint->complaint_to_id == $user->id || $user->hasRole('Admin') || $complaint->complaint_from_id == $user->id ){
-            $complaint_log = DB::table('complaint_logs')->where('complaint_id',$id)->orderBy('created_at','ASC')->get();
+            $complaint_log = DB::table('complaint_logs')->join('users','complaint_logs.changed_by','=','users.id')->where('complaint_logs.complaint_id',$id)
+            ->select('complaint_logs.*', 'users.name as changed_by_name')->orderBy('complaint_logs.created_at','DESC')->get();
             return view('backend.complaint.show',compact('complaint','complaint_log'));
         }else{
             return redirect()->route('compliant.index')->with('error','You are not authorised to see the complaint');

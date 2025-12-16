@@ -68,7 +68,7 @@ class HolidayController extends Controller
             'h_date' => 'required|date|unique:holidays,date,'.$holiday->id,
             'occasion' => 'required|string|max:255',
         ]);
-
+            
         if($holiday){
               $holiday->update([
                 'date'=> $request->h_date,
