@@ -45,3 +45,6 @@ and Parent roles.
 ## Purpose
 This project was developed to simplify school administration and improve communication 
 between students, parents, teachers, and administrators.
+
+## License
+This project is licensed under the MIT License.
